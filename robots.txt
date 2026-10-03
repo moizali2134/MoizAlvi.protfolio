@@ -1,0 +1,18 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+Allow: /saas
+Allow: /mobile
+Allow: /ai-automation
+Allow: /architecture
+Allow: /about
+Allow: /contact
+Allow: /brand/
+Allow: /mockups/
+
+# Disallow build and private assets
+Disallow: /dist/
+Disallow: /*.json$
+
+# Sitemaps
+Sitemap: https://moizalvi.vercel.app/sitemap.xml

@@ -1,14 +1,30 @@
 <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="favGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stopColor="#06B6D4" />
-      <stop offset="50%" stopColor="#6366F1" />
-      <stop offset="100%" stopColor="#A855F7" />
+    <linearGradient id="favSapphireGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#3B82F6" />
+      <stop offset="50%" stopColor="#2563EB" />
+      <stop offset="100%" stopColor="#1D4ED8" />
     </linearGradient>
   </defs>
-  <path d="M50 4L92 27.5V72.5L50 96L8 72.5V27.5L50 4Z" fill="#0A0E1A" stroke="url(#favGrad)" stroke-width="4" stroke-linejoin="round"/>
-  <path d="M50 14L68 30L58 38L50 31L42 38L32 30L50 14Z" fill="url(#favGrad)"/>
-  <path d="M50 44L74 65V78L50 56L26 78V65L50 44Z" fill="url(#favGrad)"/>
-  <path d="M32 58H68L62 66H38L32 58Z" fill="#38BDF8"/>
-  <circle cx="50" cy="46" r="4" fill="#38BDF8"/>
+  
+  <!-- Canvas Base -->
+  <rect width="100" height="100" rx="24" fill="#0A0E17" stroke="#1E293B" stroke-width="2" />
+  
+  <!-- Left Wing: Solid Crisp White -->
+  <path
+    d="M50 16 L16 54 L28 72 L40 56 V74 L50 66 V16 Z"
+    fill="#FFFFFF"
+  />
+  
+  <!-- Right Wing: Vibrant Sapphire Royal Blue with Cyan Highlight -->
+  <path
+    d="M50 16 L84 54 L72 72 L60 56 V74 L50 66 V16 Z"
+    fill="url(#favSapphireGrad)"
+    stroke="#60A5FA"
+    stroke-width="1.5"
+    stroke-linejoin="round"
+  />
+
+  <!-- Center Seam Accent -->
+  <line x1="50" y1="16" x2="50" y2="66" stroke="#38BDF8" stroke-width="1" />
 </svg>
