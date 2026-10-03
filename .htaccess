@@ -1,0 +1,81 @@
+# ==============================================================================
+# Production .htaccess for Vite / React Single Page Application (SPA)
+# ==============================================================================
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # 1. Force HTTPS (Optional - uncomment if SSL is installed and not handled by Cloudflare)
+  # RewriteCond %{HTTPS} !=on
+  # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+  # 2. Prevent directory listings
+  Options -Indexes
+
+  # 3. SPA Client-Side Routing Fallback
+  # If requested resource is not an existing file or directory, rewrite to index.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# ==============================================================================
+# Security Headers
+# ==============================================================================
+<IfModule mod_headers.c>
+  # Protect against MIME type sniffing
+  Header set X-Content-Type-Options "nosniff"
+
+  # Protect against Clickjacking
+  Header set X-Frame-Options "SAMEORIGIN"
+
+  # Cross-Site Scripting (XSS) filter
+  Header set X-XSS-Protection "1; mode=block"
+
+  # Referrer policy
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# ==============================================================================
+# MIME Types
+# ==============================================================================
+<IfModule mod_mime.c>
+  AddType text/html .html
+  AddType text/css .css
+  AddType application/javascript .js .mjs
+  AddType application/json .json
+  AddType image/svg+xml .svg .svgz
+  AddType image/webp .webp
+  AddType image/png .png
+  AddType image/jpeg .jpg .jpeg
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+</IfModule>
+
+# ==============================================================================
+# Gzip / Deflate Compression
+# ==============================================================================
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+  AddOutputFilterByType DEFLATE application/javascript application/x-javascript text/javascript
+  AddOutputFilterByType DEFLATE application/json application/xml application/rss+xml
+  AddOutputFilterByType DEFLATE image/svg+xml font/opentype application/vnd.ms-fontobject
+</IfModule>
+
+# ==============================================================================
+# Cache-Control Headers
+# ==============================================================================
+<IfModule mod_headers.c>
+  # 1. Never cache HTML entrypoint so users always load the latest bundle
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires "0"
+  </FilesMatch>
+
+  # 2. Immutable caching for Vite hashed assets (JS, CSS, images, fonts)
+  <FilesMatch "\.(js|mjs|css|webp|png|jpg|jpeg|svg|woff|woff2|ttf|eot)$">
+    Header set Cache-Control "max-age=31536000, public, immutable"
+  </FilesMatch>
+</IfModule>
