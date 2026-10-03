@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Map Radius & Geofencing Engine</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body {
+    width: 2000px;
+    height: 1500px;
+    overflow: hidden;
+    background: radial-gradient(circle at 70% 30%, #08212e 0%, #041017 50%, #010507 100%);
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+  .ambient-glow {
+    position: absolute;
+    width: 1000px; height: 1000px;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.22) 0%, rgba(14, 165, 233, 0.08) 40%, transparent 70%);
+    filter: blur(90px); top: 200px; right: 150px;
+  }
+  .container { width: 1880px; height: 1380px; display: flex; gap: 50px; z-index: 10; align-items: center; }
+  .left-card {
+    width: 460px; height: 1260px;
+    background: linear-gradient(180deg, rgba(8, 33, 46, 0.85) 0%, rgba(4, 16, 23, 0.95) 100%);
+    border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 40px; padding: 60px 42px;
+    display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 10px; padding: 8px 18px;
+    background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.4); border-radius: 20px;
+    color: #22D3EE; font-size: 13px; font-weight: 800; text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+  }
+  .title { font-family: 'Outfit', sans-serif; font-size: 44px; font-weight: 900; color: #FFFFFF; line-height: 1.12; margin-top: 24px; margin-bottom: 12px; }
+  .subtitle { font-size: 18px; color: #CBD5E1; line-height: 1.4; font-weight: 500; }
+  .features-list { margin-top: 36px; display: flex; flex-direction: column; gap: 16px; }
+  .feat-item { display: flex; align-items: center; gap: 14px; font-size: 16px; color: #F1F5F9; font-weight: 600; }
+  .feat-dot {
+    width: 22px; height: 22px; border-radius: 50%; background: rgba(6, 182, 212, 0.2); border: 1px solid #06B6D4;
+    display: flex; align-items: center; justify-content: center; color: #22D3EE; font-size: 12px; font-weight: 900;
+  }
+  .metric-card {
+    background: rgba(6, 182, 212, 0.08); border: 1px solid rgba(6, 182, 212, 0.3);
+    border-radius: 24px; padding: 24px; text-align: center;
+  }
+  .metric-val { font-family: 'Outfit', sans-serif; font-size: 46px; font-weight: 900; color: #22D3EE; }
+  .metric-lbl { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #94A3B8; text-transform: uppercase; margin-top: 4px; }
+  .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .tag {
+    padding: 6px 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px; font-size: 13px; font-family: 'JetBrains Mono', monospace; color: #E2E8F0; font-weight: 600;
+  }
+  .right-stage { flex: 1; height: 1260px; display: flex; align-items: center; justify-content: center; gap: 30px; }
+  .phone-frame {
+    width: 440px; height: 900px; background: #0F172A; border-radius: 56px; border: 8px solid #334155;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 2px rgba(6, 182, 212, 0.3); overflow: hidden; display: flex; flex-direction: column;
+  }
+  .phone-notch { width: 140px; height: 24px; background: #1E293B; border-radius: 0 0 16px 16px; align-self: center; z-index: 50; }
+  .phone-content { flex: 1; position: relative; background: #07151D; overflow: hidden; }
+  .map-canvas {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 50%, #0c2331 0%, #06131c 100%);
+  }
+  .map-circle {
+    position: absolute; width: 320px; height: 320px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, rgba(6, 182, 212, 0.05) 70%);
+    border: 2px dashed #06B6D4;
+    top: 48%; left: 50%; transform: translate(-50%, -50%);
+    box-shadow: 0 0 40px rgba(6, 182, 212, 0.4);
+  }
+  .map-center-pin {
+    position: absolute; width: 20px; height: 20px; border-radius: 50%; background: #22D3EE;
+    top: 48%; left: 50%; transform: translate(-50%, -50%); box-shadow: 0 0 25px #22D3EE, 0 0 0 6px rgba(34, 211, 238, 0.3);
+    z-index: 30;
+  }
+  .map-poi {
+    position: absolute; padding: 6px 12px; background: #0F172A; border: 1px solid #06B6D4;
+    border-radius: 12px; font-size: 11px; font-family: 'JetBrains Mono'; font-weight: 700; color: #FFF;
+    display: flex; align-items: center; gap: 6px; box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  }
+  .map-controls-bottom {
+    position: absolute; bottom: 20px; left: 20px; right: 20px;
+    background: rgba(7, 21, 29, 0.95); border: 1px solid rgba(6, 182, 212, 0.4);
+    border-radius: 24px; padding: 20px; backdrop-blur: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  }
+  .telemetry-card {
+    width: 420px; background: rgba(8, 33, 46, 0.85); border: 1px solid rgba(6, 182, 212, 0.3);
+    border-radius: 32px; padding: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="grid-pattern"></div>
+<div class="ambient-glow"></div>
+
+<div class="container">
+  <div class="left-card">
+    <div>
+      <div class="pill">● GEOSPATIAL &amp; RADAR</div>
+      <h1 class="title">Map Radius &amp; Geofencing</h1>
+      <p class="subtitle">Interactive Map Radar, Dynamic Radius Selector &amp; Spatial Queries</p>
+      
+      <div class="features-list">
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Sub-Meter Haversine Precision</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Dynamic Radius Slider (0.5km - 50km)</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Geofence Entry/Exit Event Triggers</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>60fps Zero-Lag Smooth Map Panning</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Reverse Geocoding &amp; Autocomplete</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="metric-card">
+        <div class="metric-val">&lt;1m</div>
+        <div class="metric-lbl">Haversine Spatial Precision</div>
+      </div>
+
+      <div class="tech-tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">Dart</span>
+        <span class="tag">Google Maps</span>
+        <span class="tag">Geolocator</span>
+        <span class="tag">Vector Math</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-stage">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-content">
+        <div class="map-canvas">
+          <!-- Vector Map Road Grid -->
+          <svg style="position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35;">
+            <line x1="0" y1="180" x2="440" y2="180" stroke="#06B6D4" stroke-width="4"/>
+            <line x1="0" y1="360" x2="440" y2="360" stroke="#0EA5E9" stroke-width="3"/>
+            <line x1="0" y1="580" x2="440" y2="580" stroke="#06B6D4" stroke-width="4"/>
+            <line x1="120" y1="0" x2="120" y2="900" stroke="#06B6D4" stroke-width="3"/>
+            <line x1="280" y1="0" x2="280" y2="900" stroke="#0EA5E9" stroke-width="4"/>
+            <line x1="380" y1="0" x2="380" y2="900" stroke="#06B6D4" stroke-width="2"/>
+          </svg>
+          <div class="map-circle"></div>
+          <div class="map-center-pin"></div>
+
+          <!-- POI Marker 1 -->
+          <div class="map-poi" style="top: 36%; left: 32%;">
+            <span style="color: #22D3EE;">🛵 Rider #12</span>
+            <span style="color: #34D399;">0.8km</span>
+          </div>
+
+          <!-- POI Marker 2 -->
+          <div class="map-poi" style="top: 56%; left: 52%;">
+            <span style="color: #22D3EE;">🛵 Rider #07</span>
+            <span style="color: #34D399;">1.4km</span>
+          </div>
+
+          <!-- POI Marker 3 -->
+          <div class="map-poi" style="top: 42%; left: 62%;">
+            <span style="color: #F59E0B;">📦 Hub Express</span>
+          </div>
+        </div>
+
+        <div class="map-controls-bottom">
+          <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono'; font-size: 13px; color: #FFF; font-weight: 700;">
+            <span>ACTIVE GEOFENCE RADIUS</span>
+            <span style="color: #22D3EE; font-size: 15px;">3.50 KM</span>
+          </div>
+          <div style="height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin: 14px 0; position: relative;">
+            <div style="width: 50%; height: 100%; background: linear-gradient(90deg, #06B6D4, #22D3EE); border-radius: 4px;"></div>
+            <div style="width: 18px; height: 18px; background: #FFF; border-radius: 50%; position: absolute; top: -5px; left: 49%; box-shadow: 0 0 15px #06B6D4;"></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 11px; color: #94A3B8; font-family: 'JetBrains Mono';">
+            <span>● <strong>7 Active Drivers In-Zone</strong></span>
+            <span>Est. Arrival: <strong>3.2 min</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Side Telemetry -->
+    <div class="telemetry-card">
+      <div style="font-size: 14px; font-family: 'JetBrains Mono'; color: #22D3EE; font-weight: 800; text-transform: uppercase;">
+        🌐 Real-Time Spatial Telemetry
+      </div>
+      <div style="background: rgba(0,0,0,0.4); border-radius: 18px; padding: 20px; border: 1px solid rgba(255,255,255,0.06); font-family: 'JetBrains Mono'; font-size: 13px; color: #CBD5E1; display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #94A3B8;">GPS Lat / Lng</span>
+          <span style="color: #FFF;">33.6844° N, 73.0479° E</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #94A3B8;">Haversine Radius</span>
+          <span style="color: #22D3EE;">3,500 Meters</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: #94A3B8;">Geofence State</span>
+          <span style="color: #34D399; font-weight: 800;">INSIDE PERIMETER</span>
+        </div>
+      </div>
+      <div style="padding: 16px; background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.3); border-radius: 18px; font-size: 13px; color: #E0F2FE;">
+        ⚡ <strong>Sub-Meter Mathematical Accuracy:</strong> Fast spatial query filter processes 10,000+ points in &lt;1.2ms.
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

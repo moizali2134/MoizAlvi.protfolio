@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Real-Time Auction & Bidding App</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body {
+    width: 2000px;
+    height: 1500px;
+    overflow: hidden;
+    background: radial-gradient(circle at 70% 30%, #1c1508 0%, #0d0a04 50%, #050401 100%);
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(245, 158, 11, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(245, 158, 11, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(circle at 50% 50%, black, transparent 85%);
+  }
+  .ambient-glow {
+    position: absolute;
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.08) 40%, transparent 70%);
+    filter: blur(80px);
+    top: 200px;
+    right: 150px;
+  }
+  .container {
+    width: 1880px;
+    height: 1380px;
+    display: flex;
+    gap: 50px;
+    z-index: 10;
+    align-items: center;
+  }
+  
+  /* LEFT CARD */
+  .left-card {
+    width: 460px;
+    height: 1260px;
+    background: linear-gradient(180deg, rgba(30, 22, 10, 0.85) 0%, rgba(15, 11, 4, 0.95) 100%);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 40px;
+    padding: 60px 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+    backdrop-blur: 20px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 20px;
+    color: #FBBF24;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+    width: fit-content;
+  }
+  .title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 44px;
+    font-weight: 900;
+    color: #FFFFFF;
+    line-height: 1.12;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+  }
+  .subtitle {
+    font-size: 18px;
+    color: #CBD5E1;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .features-list {
+    margin-top: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .feat-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 16px;
+    color: #F1F5F9;
+    font-weight: 600;
+  }
+  .feat-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid #F59E0B;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #FBBF24;
+    font-size: 12px;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .metric-card {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 24px;
+    padding: 24px;
+    text-align: center;
+  }
+  .metric-val {
+    font-family: 'Outfit', sans-serif;
+    font-size: 46px;
+    font-weight: 900;
+    color: #FBBF24;
+  }
+  .metric-lbl {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+  .tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .tag {
+    padding: 6px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #E2E8F0;
+    font-weight: 600;
+  }
+
+  /* RIGHT STAGE */
+  .right-stage {
+    flex: 1;
+    height: 1260px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  /* PHONE MOCKUP */
+  .phone-frame {
+    width: 440px;
+    height: 900px;
+    background: #0F172A;
+    border-radius: 56px;
+    border: 8px solid #334155;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 2px rgba(245, 158, 11, 0.3);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .phone-notch {
+    width: 140px;
+    height: 24px;
+    background: #1E293B;
+    border-radius: 0 0 16px 16px;
+    align-self: center;
+    z-index: 50;
+  }
+  .phone-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #070B14;
+    overflow: hidden;
+  }
+  .auction-hero-card {
+    background: linear-gradient(180deg, #1E170A 0%, #120D04 100%);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 24px;
+    padding: 20px;
+    position: relative;
+  }
+  .car-img-wrap {
+    width: 100%;
+    height: 180px;
+    background: radial-gradient(circle, #38250C 0%, #1A1206 100%);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(245,158,11,0.2);
+  }
+  .car-title {
+    color: #FFF;
+    font-size: 20px;
+    font-weight: 800;
+    margin-top: 14px;
+  }
+  .car-sub {
+    color: #94A3B8;
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .bid-gauge {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0,0,0,0.4);
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    margin-top: 14px;
+  }
+  .bid-price {
+    font-family: 'Outfit', sans-serif;
+    font-size: 30px;
+    font-weight: 900;
+    color: #FBBF24;
+  }
+  .timer-pill {
+    background: #EF4444;
+    color: #FFF;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 800;
+    padding: 6px 14px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+  }
+  .bid-stream {
+    background: #0B111E;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .stream-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 800;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .stream-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stream-row.latest {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #FBBF24;
+    font-weight: 800;
+  }
+  .bid-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+    color: #000;
+    font-family: 'Outfit', sans-serif;
+    font-size: 18px;
+    font-weight: 900;
+    border-radius: 18px;
+    border: none;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+    cursor: pointer;
+  }
+
+  /* AUXILIARY TELEMETRY CARDS */
+  .telemetry-card {
+    width: 420px;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 32px;
+    padding: 32px;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+    backdrop-blur: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .telemetry-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #FBBF24;
+    font-size: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    text-transform: uppercase;
+  }
+  .chart-mock {
+    width: 100%;
+    height: 160px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .bar {
+    flex: 1;
+    background: linear-gradient(180deg, #F59E0B 0%, #B45309 100%);
+    border-radius: 6px 6px 0 0;
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+  }
+</style>
+</head>
+<body>
+<div class="grid-pattern"></div>
+<div class="ambient-glow"></div>
+
+<div class="container">
+  <!-- LEFT PANEL -->
+  <div class="left-card">
+    <div>
+      <div class="pill">● NATIVE ANDROID ENGINE</div>
+      <h1 class="title">Real-Time Auction &amp; Bidding</h1>
+      <p class="subtitle">Live Bidding Engine, Server Synchronized Countdown &amp; Outbid Alerts</p>
+      
+      <div class="features-list">
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Sub-Second Real-Time Bids (&lt;150ms)</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Server Clock Synchronized Timers</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Instant Outbid Push Notifications</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Local SQLite Watchlist Vault</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Secure KYC Bidder Verification</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="metric-card">
+        <div class="metric-val">&lt;150ms</div>
+        <div class="metric-lbl">Sub-Second Bid Latency</div>
+      </div>
+
+      <div class="tech-tags">
+        <span class="tag">Java</span>
+        <span class="tag">Android SDK</span>
+        <span class="tag">Gradle</span>
+        <span class="tag">SQLite</span>
+        <span class="tag">REST APIs</span>
+        <span class="tag">Material 3</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT STAGE -->
+  <div class="right-stage">
+    <!-- Center Phone -->
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-content">
+        <div class="auction-hero-card">
+          <div class="car-img-wrap">
+            <svg width="220" height="120" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M20 70 L40 50 L80 40 L130 40 L170 60 L185 70 Z" fill="#F59E0B" opacity="0.9"/>
+              <circle cx="55" cy="72" r="14" fill="#1E293B" stroke="#FBBF24" stroke-width="3"/>
+              <circle cx="145" cy="72" r="14" fill="#1E293B" stroke="#FBBF24" stroke-width="3"/>
+              <path d="M75 44 L125 44 L145 60 L60 60 Z" fill="#0F172A"/>
+            </svg>
+          </div>
+          <div class="car-title">2024 Porsche 911 GT3 RS</div>
+          <div class="car-sub">LOT #4892 · 4.0L FLAT-6 · 518 HP</div>
+          <div class="bid-gauge">
+            <div>
+              <div style="font-size: 11px; color: #94A3B8; font-family: 'JetBrains Mono'; font-weight: 700;">CURRENT HIGHEST BID</div>
+              <div class="bid-price">$248,500</div>
+            </div>
+            <div class="timer-pill">⏳ 00:04:32</div>
+          </div>
+        </div>
+
+        <div class="bid-stream">
+          <div class="stream-title">⚡ Live Bid Telemetry Stream</div>
+          <div class="stream-row latest">
+            <span>● Bidder #412 (You)</span>
+            <span>$248,500</span>
+          </div>
+          <div class="stream-row">
+            <span>Bidder #890</span>
+            <span>$247,000</span>
+          </div>
+          <div class="stream-row">
+            <span>Bidder #204</span>
+            <span>$245,000</span>
+          </div>
+        </div>
+
+        <button class="bid-btn">PLACE BID (+$2,500)</button>
+      </div>
+    </div>
+
+    <!-- Right Telemetry -->
+    <div class="telemetry-card">
+      <div class="telemetry-header">
+        <span>📊 Bid Velocity &amp; Analytics</span>
+      </div>
+      <div class="chart-mock">
+        <div class="bar" style="height: 35%;"></div>
+        <div class="bar" style="height: 55%;"></div>
+        <div class="bar" style="height: 40%;"></div>
+        <div class="bar" style="height: 75%;"></div>
+        <div class="bar" style="height: 60%;"></div>
+        <div class="bar" style="height: 90%;"></div>
+        <div class="bar" style="height: 100%;"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-family: 'JetBrains Mono'; font-size: 13px; color: #CBD5E1;">
+        <span>Active Bidders: <strong>38</strong></span>
+        <span>Watchlist: <strong>142</strong></span>
+      </div>
+      <div style="padding: 16px; background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.25); border-radius: 16px; font-size: 13px; color: #FDE68A;">
+        ⚡ <strong>Auction Status:</strong> High Activity Warning — Increments locked to +$2,500.
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

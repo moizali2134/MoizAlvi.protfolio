@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nightmares & Sleep Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body {
+    width: 2000px;
+    height: 1500px;
+    overflow: hidden;
+    background: radial-gradient(circle at 70% 30%, #150e24 0%, #0b0714 50%, #030206 100%);
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+    mask-image: radial-gradient(circle at 50% 50%, black, transparent 85%);
+  }
+  .ambient-glow {
+    position: absolute;
+    width: 900px;
+    height: 900px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, rgba(99, 102, 241, 0.08) 40%, transparent 70%);
+    filter: blur(80px);
+    top: 200px;
+    right: 150px;
+  }
+  .container {
+    width: 1880px;
+    height: 1380px;
+    display: flex;
+    gap: 50px;
+    z-index: 10;
+    align-items: center;
+  }
+  .left-card {
+    width: 460px;
+    height: 1260px;
+    background: linear-gradient(180deg, rgba(25, 17, 44, 0.85) 0%, rgba(11, 7, 20, 0.95) 100%);
+    border: 1px solid rgba(139, 92, 246, 0.25);
+    border-radius: 40px;
+    padding: 60px 42px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 18px;
+    background: rgba(139, 92, 246, 0.15);
+    border: 1px solid rgba(139, 92, 246, 0.4);
+    border-radius: 20px;
+    color: #C084FC;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 44px;
+    font-weight: 900;
+    color: #FFFFFF;
+    line-height: 1.12;
+    margin-top: 24px;
+    margin-bottom: 12px;
+  }
+  .subtitle { font-size: 18px; color: #CBD5E1; line-height: 1.4; font-weight: 500; }
+  .features-list { margin-top: 36px; display: flex; flex-direction: column; gap: 16px; }
+  .feat-item { display: flex; align-items: center; gap: 14px; font-size: 16px; color: #F1F5F9; font-weight: 600; }
+  .feat-dot {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: rgba(139, 92, 246, 0.2); border: 1px solid #8B5CF6;
+    display: flex; align-items: center; justify-content: center; color: #C084FC; font-size: 12px; font-weight: 900; flex-shrink: 0;
+  }
+  .metric-card {
+    background: rgba(139, 92, 246, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: 24px; padding: 24px; text-align: center;
+  }
+  .metric-val { font-family: 'Outfit', sans-serif; font-size: 46px; font-weight: 900; color: #C084FC; }
+  .metric-lbl { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; color: #94A3B8; text-transform: uppercase; margin-top: 4px; }
+  .tech-tags { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  .tag {
+    padding: 6px 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px; font-size: 13px; font-family: 'JetBrains Mono', monospace; color: #E2E8F0; font-weight: 600;
+  }
+  .right-stage { flex: 1; height: 1260px; display: flex; align-items: center; justify-content: center; gap: 30px; }
+  .phone-frame {
+    width: 440px; height: 900px; background: #0F172A; border-radius: 56px; border: 8px solid #334155;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.8), 0 0 0 2px rgba(139, 92, 246, 0.3); overflow: hidden; display: flex; flex-direction: column;
+  }
+  .phone-notch { width: 140px; height: 24px; background: #1E293B; border-radius: 0 0 16px 16px; align-self: center; }
+  .phone-content { flex: 1; padding: 22px; display: flex; flex-direction: column; gap: 16px; background: #09070F; }
+  .entry-card {
+    background: linear-gradient(180deg, #1A1329 0%, #100B1A 100%);
+    border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 24px; padding: 20px;
+  }
+  .waveform-box {
+    background: rgba(0,0,0,0.4); border-radius: 16px; padding: 14px; display: flex; align-items: center; gap: 12px; margin-top: 14px;
+    border: 1px solid rgba(139,92,246,0.2);
+  }
+  .telemetry-card {
+    width: 420px; background: rgba(15, 11, 28, 0.85); border: 1px solid rgba(139,92,246,0.2);
+    border-radius: 32px; padding: 32px; box-shadow: 0 25px 60px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 20px;
+  }
+</style>
+</head>
+<body>
+<div class="grid-pattern"></div>
+<div class="ambient-glow"></div>
+
+<div class="container">
+  <div class="left-card">
+    <div>
+      <div class="pill">● SLEEP WELLNESS &amp; DIARY</div>
+      <h1 class="title">Nightmares &amp; Sleep Tracker</h1>
+      <p class="subtitle">Dream &amp; Nightmare Journal, Sleep Analytics &amp; Audio Logs</p>
+      
+      <div class="features-list">
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Mood, Intensity &amp; Fear Scales (1-10)</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Instant Morning Audio Voice Recorder</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Stress &amp; Nightmare Correlation Heatmaps</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>100% Local Encrypted SQLite Vault</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Psychological Therapist PDF Exports</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="metric-card">
+        <div class="metric-val">100%</div>
+        <div class="metric-lbl">Local Privacy &amp; Encryption</div>
+      </div>
+
+      <div class="tech-tags">
+        <span class="tag">Flutter</span>
+        <span class="tag">Dart</span>
+        <span class="tag">SQLite</span>
+        <span class="tag">Audio SDK</span>
+        <span class="tag">FL Chart</span>
+        <span class="tag">Provider</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-stage">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-content">
+        <div class="entry-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 11px; color: #A78BFA; font-family: 'JetBrains Mono'; font-weight: 700;">OCT 2, 2026 · 03:42 AM</span>
+            <span style="background: #EF4444; color: #FFF; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 12px;">FEAR 8.5/10</span>
+          </div>
+          <div style="font-size: 18px; font-weight: 800; color: #FFF; margin-top: 10px;">Lucid Bridge Collapse Dream</div>
+          <p style="font-size: 12px; color: #94A3B8; margin-top: 6px; line-height: 1.4;">
+            Sudden fall into cold fog after missing the train. Woke up sweating with elevated heart rate (94 bpm).
+          </p>
+
+          <div class="waveform-box">
+            <span style="width: 32px; height: 32px; border-radius: 50%; background: #8B5CF6; display: flex; align-items: center; justify-content: center; color: #FFF;">▶</span>
+            <div style="flex: 1; height: 20px; display: flex; align-items: center; gap: 3px;">
+              <span style="width: 3px; height: 12px; background: #A78BFA; border-radius: 2px;"></span>
+              <span style="width: 3px; height: 18px; background: #C084FC; border-radius: 2px;"></span>
+              <span style="width: 3px; height: 8px; background: #A78BFA; border-radius: 2px;"></span>
+              <span style="width: 3px; height: 16px; background: #C084FC; border-radius: 2px;"></span>
+              <span style="width: 3px; height: 20px; background: #A78BFA; border-radius: 2px;"></span>
+              <span style="width: 3px; height: 10px; background: #C084FC; border-radius: 2px;"></span>
+            </div>
+            <span style="font-size: 11px; color: #CBD5E1; font-family: 'JetBrains Mono';">01:24</span>
+          </div>
+        </div>
+
+        <div style="background: #130E20; border-radius: 20px; padding: 18px; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="font-size: 12px; font-family: 'JetBrains Mono'; color: #A78BFA; font-weight: 800; margin-bottom: 10px;">🏷️ DREAM CATEGORIES &amp; TRIGGERS</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <span style="padding: 4px 10px; background: rgba(139,92,246,0.15); border: 1px solid #8B5CF6; border-radius: 8px; font-size: 11px; color: #C084FC;">#Falling</span>
+            <span style="padding: 4px 10px; background: rgba(139,92,246,0.15); border: 1px solid #8B5CF6; border-radius: 8px; font-size: 11px; color: #C084FC;">#Lucid</span>
+            <span style="padding: 4px 10px; background: rgba(139,92,246,0.15); border: 1px solid #8B5CF6; border-radius: 8px; font-size: 11px; color: #C084FC;">#WorkStress</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="telemetry-card">
+      <div style="color: #C084FC; font-family: 'JetBrains Mono'; font-weight: 800; font-size: 14px;">📈 Monthly Sleep &amp; Trigger Correlation</div>
+      <div style="background: rgba(0,0,0,0.3); border-radius: 16px; padding: 16px; height: 160px; display: flex; align-items: flex-end; gap: 8px;">
+        <div style="flex: 1; height: 40%; background: #8B5CF6; border-radius: 4px;"></div>
+        <div style="flex: 1; height: 80%; background: #EF4444; border-radius: 4px;"></div>
+        <div style="flex: 1; height: 25%; background: #8B5CF6; border-radius: 4px;"></div>
+        <div style="flex: 1; height: 95%; background: #EF4444; border-radius: 4px;"></div>
+        <div style="flex: 1; height: 30%; background: #8B5CF6; border-radius: 4px;"></div>
+      </div>
+      <div style="font-size: 13px; color: #CBD5E1; line-height: 1.4;">
+        💡 <strong>Key Finding:</strong> Late screen time &gt;11 PM increases nightmare probability by <strong>68%</strong>.
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

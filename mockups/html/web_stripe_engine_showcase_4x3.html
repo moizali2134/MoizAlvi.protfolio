@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stripe Web & Mobile Gateway Suite</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
+  body {
+    width: 1600px;
+    height: 1200px;
+    overflow: hidden;
+    background: radial-gradient(circle at 70% 30%, #08211b 0%, #04120e 50%, #010403 100%);
+    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .grid-pattern {
+    position: absolute;
+    inset: 0;
+    background-image: linear-gradient(rgba(16, 185, 129, 0.05) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(16, 185, 129, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+  .ambient-glow {
+    position: absolute;
+    width: 900px; height: 900px;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, rgba(99, 102, 241, 0.08) 40%, transparent 70%);
+    filter: blur(80px); top: 150px; right: 100px;
+  }
+  .container { width: 1480px; height: 1080px; display: flex; gap: 40px; z-index: 10; align-items: center; }
+  .left-card {
+    width: 380px; height: 1000px;
+    background: linear-gradient(180deg, rgba(8, 33, 27, 0.85) 0%, rgba(4, 16, 13, 0.95) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 36px; padding: 50px 36px;
+    display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 30px 80px rgba(0,0,0,0.8);
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 16px;
+    background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 20px;
+    color: #34D399; font-size: 11px; font-weight: 800; text-transform: uppercase; font-family: 'JetBrains Mono', monospace;
+  }
+  .title { font-family: 'Outfit', sans-serif; font-size: 36px; font-weight: 900; color: #FFFFFF; line-height: 1.15; margin-top: 20px; margin-bottom: 10px; }
+  .subtitle { font-size: 15px; color: #CBD5E1; line-height: 1.4; font-weight: 500; }
+  .features-list { margin-top: 30px; display: flex; flex-direction: column; gap: 14px; }
+  .feat-item { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #F1F5F9; font-weight: 600; }
+  .feat-dot {
+    width: 20px; height: 20px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); border: 1px solid #10B981;
+    display: flex; align-items: center; justify-content: center; color: #34D399; font-size: 11px; font-weight: 900;
+  }
+  .metric-card {
+    background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 20px; padding: 20px; text-align: center;
+  }
+  .metric-val { font-family: 'Outfit', sans-serif; font-size: 38px; font-weight: 900; color: #34D399; }
+  .metric-lbl { font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 700; color: #94A3B8; text-transform: uppercase; margin-top: 4px; }
+  .tech-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+  .tag {
+    padding: 5px 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px; font-size: 12px; font-family: 'JetBrains Mono', monospace; color: #E2E8F0; font-weight: 600;
+  }
+  .right-stage { flex: 1; height: 1000px; display: flex; align-items: center; justify-content: center; gap: 28px; }
+  .checkout-window {
+    width: 580px; background: #0A121E; border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 28px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.8); overflow: hidden;
+  }
+  .window-header {
+    background: #0F1D2C; padding: 16px 22px; border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .window-body { padding: 28px; display: flex; flex-direction: column; gap: 20px; }
+  .pay-btn {
+    width: 100%; padding: 16px; background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%);
+    color: #FFF; font-weight: 800; font-size: 16px; border-radius: 14px; border: none; font-family: 'Outfit';
+    cursor: pointer; box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+  }
+  .webhook-stream-card {
+    width: 440px; background: #08101A; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 28px; padding: 28px; box-shadow: 0 25px 60px rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 16px;
+  }
+</style>
+</head>
+<body>
+<div class="grid-pattern"></div>
+<div class="ambient-glow"></div>
+
+<div class="container">
+  <div class="left-card">
+    <div>
+      <div class="pill">● PAYMENT GATEWAY &amp; BILLING</div>
+      <h1 class="title">Stripe Web &amp; Mobile Suite</h1>
+      <p class="subtitle">Cross-Platform Stripe SDK, PaymentIntents &amp; Webhook Engine</p>
+      
+      <div class="features-list">
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Multi-Platform (Flutter Web, iOS &amp; Android)</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Strong Customer Authentication (SCA 3DS)</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Apple Pay &amp; Google Pay One-Tap</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Idempotent Webhook Handlers</span></div>
+        <div class="feat-item"><div class="feat-dot">✓</div><span>Zero Financial Ledger Drift</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="metric-card">
+        <div class="metric-val">99.8%</div>
+        <div class="metric-lbl">3D-Secure Success Rate</div>
+      </div>
+
+      <div class="tech-tags">
+        <span class="tag">Flutter Web</span>
+        <span class="tag">Dart</span>
+        <span class="tag">C++</span>
+        <span class="tag">Stripe SDK</span>
+        <span class="tag">PaymentIntents</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="right-stage">
+    <div class="checkout-window">
+      <div class="window-header">
+        <span style="font-size: 13px; font-family: 'JetBrains Mono'; color: #34D399; font-weight: 800;">🔒 STRIPE SECURE CHECKOUT</span>
+        <span style="font-size: 11px; color: #94A3B8; font-family: 'JetBrains Mono';">PCI-DSS LEVEL 1</span>
+      </div>
+      <div class="window-body">
+        <div style="background: rgba(255,255,255,0.03); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.06);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 14px; color: #94A3B8;">Enterprise License (Annual)</span>
+            <span style="font-family: 'Outfit'; font-size: 28px; font-weight: 900; color: #FFF;">$149.00 USD</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+          <div style="flex: 1; padding: 14px; background: #000; border-radius: 12px; text-align: center; color: #FFF; font-weight: 800; font-size: 14px; border: 1px solid #334155;"> Pay</div>
+          <div style="flex: 1; padding: 14px; background: #1E293B; border-radius: 12px; text-align: center; color: #FFF; font-weight: 800; font-size: 14px; border: 1px solid #334155;">G Pay</div>
+        </div>
+
+        <div style="background: rgba(0,0,0,0.3); border-radius: 14px; padding: 16px; border: 1px solid rgba(255,255,255,0.08); font-family: 'JetBrains Mono'; font-size: 13px; color: #CBD5E1;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <span>CARD NUMBER</span>
+            <span>VISA / MASTERCARD</span>
+          </div>
+          <div style="color: #FFF; font-size: 16px; letter-spacing: 2px;">•••• •••• •••• 4242</div>
+        </div>
+
+        <button class="pay-btn">PAY $149.00 WITH 3D-SECURE</button>
+      </div>
+    </div>
+
+    <!-- Webhook Stream Telemetry -->
+    <div class="webhook-stream-card">
+      <div style="font-size: 13px; font-family: 'JetBrains Mono'; color: #34D399; font-weight: 800;">
+        ⚡ Webhook Event Stream
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 10px; font-family: 'JetBrains Mono'; font-size: 12px;">
+        <div style="padding: 12px; background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); border-radius: 12px; color: #34D399;">
+          <div>● payment_intent.succeeded</div>
+          <div style="color: #94A3B8; font-size: 10px; margin-top: 4px;">200 OK · Idempotency Verified (124ms)</div>
+        </div>
+        <div style="padding: 12px; background: rgba(255,255,255,0.03); border-radius: 12px; color: #CBD5E1;">
+          <div>charge.captured</div>
+          <div style="color: #64748B; font-size: 10px; margin-top: 4px;">Receipt dispatched via email</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
